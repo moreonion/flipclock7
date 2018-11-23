@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Countdown Timer Field #2 install file.
+ */
+
+/**
+ * Implements hook_field_schema().
+ *
+ * Loads Date module install file and adds visibility column.
+ */
+function flipclock7_field_schema($field) {
+  if ($field['type'] === 'flipclock7') {
+    $hack = $field;
+    $hack['type'] = 'datestamp';
+
+    module_load_install('date');
+    $schema = date_field_schema($hack);
+
+    $schema['columns']['visibility'] = array(
+      'type' => 'int',
+      'length' => 1,
+      'not null' => FALSE,
+    );
+    $schema['columns']['heading'] = array(
+      'type' => 'text',
+      'length' => 90,
+      'not null' => FALSE,
+    );
+
+    return $schema;
+  }
+}

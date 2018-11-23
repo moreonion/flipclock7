@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @file
+ * Contains alter hooks, validation and theme functions.
+ *
+ * Countdown timer field module allows you to create countdown timer
+ * field to count the days, hours, minutes, and seconds until a specified
+ * event.
+ */
+
+/**
+ * Implements hook_libraries_info().
+ */
+function flipclock7_libraries_info() {
+  $libraries['FlipClock'] = [
+    'name' => 'FlipClock',
+    'vendor url' => 'http://flipclockjs.com/',
+    'download url' => 'https://github.com/objectivehtml/FlipClock/releases',
+    'version arguments' => [
+      'file' => 'package.json',
+      'pattern' => '"(\d+\.\d+\.\d+)"',
+      'lines' => 5,
+    ],
+    'files' => [
+      'css' => ['compiled/flipclock.css' => []],
+      'js' => ['compiled/flipclock.min.js' => []],
+    ],
+  ];
+  return $libraries;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function flipclock7_theme() {
+  return array(
+    'flipclock7_timer' => array(
+      'template' => 'flipclock7-timer',
+      'variables' => array(
+        'timer_id' => NULL,
+        'language' => NULL,
+        'heading' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_hook_info_alter().
+ */
+function flipclock7_hook_info_alter(&$info) {
+  $hooks = [
+    'field_formatter_info',
+    'field_info',
+    'field_instance_settings_form',
+    'field_is_empty',
+    'field_load',
+    'field_settings_form',
+    'field_widget_form',
+    'field_widget_info',
+    'field_widget_settings_form',
+    'field_widget_properties_alter',
+  ];
+  foreach ($hooks as $hook) {
+    if (!isset($info[$hook]['group'])) {
+      $info[$hook]['group'] = 'field';
+    }
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * This can’t be put into the field.inc because it is not invoked via
+ * module_invoke().
+ */
+function flipclock7_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  module_load_include('field.inc', 'flipclock7');
+  return _flipclock7_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display);
+}
