@@ -9,6 +9,9 @@
  * event.
  */
 
+// Loading field hooks on-demand is not supported by Drupal.
+module_load_include('field.inc', 'flipclock7');
+
 /**
  * Implements hook_libraries_info().
  */
@@ -44,38 +47,4 @@ function flipclock7_theme() {
       ),
     ),
   );
-}
-
-/**
- * Implements hook_hook_info_alter().
- */
-function flipclock7_hook_info_alter(&$info) {
-  $hooks = [
-    'field_formatter_info',
-    'field_info',
-    'field_instance_settings_form',
-    'field_is_empty',
-    'field_load',
-    'field_settings_form',
-    'field_widget_form',
-    'field_widget_info',
-    'field_widget_settings_form',
-    'field_widget_properties_alter',
-  ];
-  foreach ($hooks as $hook) {
-    if (!isset($info[$hook]['group'])) {
-      $info[$hook]['group'] = 'field';
-    }
-  }
-}
-
-/**
- * Implements hook_field_formatter_view().
- *
- * This can’t be put into the field.inc because it is not invoked via
- * module_invoke().
- */
-function flipclock7_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
-  module_load_include('field.inc', 'flipclock7');
-  return _flipclock7_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display);
 }

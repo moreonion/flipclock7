@@ -181,7 +181,7 @@ function flipclock7_field_is_empty($item, $field) {
 /**
  * Implements hook_field_formatter_view().
  */
-function _flipclock7_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+function flipclock7_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
   $font_size = $display['settings']['font_size'];
 
