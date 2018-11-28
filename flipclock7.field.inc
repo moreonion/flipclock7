@@ -10,6 +10,15 @@ module_load_include('inc', 'date', 'date_elements');
 module_load_include('module', 'date', 'date');
 
 /**
+ * Helper function to remove the flipclock7_ prefix from a string.
+ */
+function _flipclock7_remove_prefix(&$str) {
+  if (substr($str, 0, 11) == 'flipclock7_') {
+    $str = substr($str, 11);
+  }
+}
+
+/**
  * Implements hook_field_load().
  */
 function flipclock7_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
@@ -102,7 +111,7 @@ function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, 
 
   // Strip flipclock7_ from the widget_type to get a valid
   // date module widget type.
-  $element['#widget_type'] = substr($element['#widget_type'], 17);
+  _flipclock7_remove_prefix($element['#widget_type']);
   $element['#element_validate'] = array('flipclock7_validate');
 
   return $element;
@@ -126,7 +135,7 @@ function flipclock7_validate($element, &$form_state) {
   $parents = _field_form_state_parents($element['#field_parents'], $element['#field_name'], $element['#language']);
   $field_state = &drupal_array_get_nested_value($form_state, $parents);
   $backup = $field_state;
-  $field_state['instance']['widget']['type'] = str_replace('flipclock7_', '', $field_state['instance']['widget']['type']);
+  _flipclock7_remove_prefix($field_state['instance']['widget']['type']);
   date_combo_validate($element, $form_state);
   $field_state = $backup;
   $element['value']['#field']['type'] = 'flipclock7';
@@ -140,12 +149,9 @@ function flipclock7_validate($element, &$form_state) {
  * values.
  */
 function flipclock7_field_widget_properties_alter(&$widget, $context) {
-  if (substr($widget['type'], 0, strlen('flipclock7_')) == 'flipclock7_') {
-    $orig_type = $widget['type'];
-    $widget['type'] = substr($widget['type'], strlen('flipclock7_'));
-    date_field_widget_properties_alter($widget, $context);
-    $widget['type'] = $orig_type;
-  }
+  $orig_type = $widget['type'];
+  _flipclock7_remove_prefix($widget['type']);
+  $widget['type'] = $orig_type;
 }
 
 /**
