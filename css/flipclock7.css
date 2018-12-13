@@ -1,17 +1,5 @@
-/*
- * We need this for correct indentation
- * in the edit form, see flipclock7.field.inc
- * line 81.
- */
-.form-margin:first-child {
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
+/* display styles */
 
-.form-margin {
-  margin-left: 10px;
-  margin-right: 10px;
-}
 
 .flip-clock-wrapper {
   font-size: 1em;
