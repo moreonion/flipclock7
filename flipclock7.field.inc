@@ -114,6 +114,7 @@ function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, 
   _flipclock7_remove_prefix($element['#widget_type']);
   $element['#element_validate'] = array('flipclock7_validate');
 
+  $element['#attached']['css'][drupal_get_path('module', 'flipclock7') . '/css/flipclock7_admin.css']['type'] = 'file';
   return $element;
 }
 
@@ -214,21 +215,15 @@ function flipclock7_display_timer($item, $language, $font_size) {
     'language' => $language,
   ];
 
-  $path = drupal_get_path('module', 'flipclock7');
   $element['#attached']['libraries_load'][] = ['FlipClock'];
-  $element['#attached']['js'][] = array(
-    'data' => $path . '/flipclock7.js',
+  $element['#attached']['js'][drupal_get_path('module', 'flipclock7') . '/flipclock7.js'] = [
     'type' => 'file',
     'scope' => 'footer',
     'weight' => 5,
-  );
+  ];
   $element['#attached']['js'][] = array(
     'data' => array('flipclock7' => $settings),
     'type' => 'setting',
-  );
-  $element['#attached']['css'][] = array(
-    'data' => $path . '/css/flipclock7_admin.css',
-    'type' => 'file',
   );
 
   $element['#theme'] = 'flipclock7_timer';
