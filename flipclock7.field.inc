@@ -78,10 +78,6 @@ function flipclock7_form_field_ui_field_edit_form_alter(&$form, &$form_state, $f
  * Implements hook_field_widget_form().
  */
 function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, $langcode, $items, $delta, $element) {
-  $field['type'] = 'datestamp';
-  $element = date_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $element);
-  $field['type'] = 'flipclock7';
-
   $item = $items[$delta] ?? [];
   $item += $field['settings'];
 
@@ -91,31 +87,74 @@ function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, 
   // be indented by 10px.
   $element['visibility'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Visible'),
+    '#title' => t('Display a countdown'),
     '#default_value' => $item['visibility'],
-    '#prefix' => '<div class="form-margin">',
-    '#suffix' => '</div>',
+    '#weight' => -10,
   );
+  $visibility_id = "#edit-" . strtr($field['field_name'], '_', '-') . "-und-$delta-visibility";
+  $visibility_state['#states']['visible'][$visibility_id]['checked'] = TRUE;
 
   $element['heading'] = array(
     '#type' => 'textfield',
     '#title' => t('Heading'),
     '#maxlength' => 90,
-    '#attributes' => array(
-      'placeholder' => t('Countdown Heading'),
-    ),
-    '#prefix' => '<div class="form-margin">',
-    '#suffix' => '</div>',
     '#default_value' => $item['heading'],
-  );
+  ) + $visibility_state;
+
+  $dt_field = ['type' => 'datestamp'] + $field;
+  $element['datetime'] =  [
+    '#flipclock7_container' => TRUE,
+    '#element_validate' => ['flipclock7_datetime_validate'],
+  ] + date_field_widget_form($form, $form_state, $dt_field, $instance, $langcode, $items, $delta, [
+    '#field_parents' => $element['#field_parents'],
+    '#field_name' => $element['#field_name'],
+    '#language' => $element['#language'],
+  ]) + $visibility_state;
 
   // Strip flipclock7_ from the widget_type to get a valid
   // date module widget type.
-  _flipclock7_remove_prefix($element['#widget_type']);
-  $element['#element_validate'] = array('flipclock7_validate');
+  _flipclock7_remove_prefix($element['datetime']['#widget_type']);
+  $element['#element_validate'] = ['flipclock7_validate'];
 
+  $element += array(
+    '#type' => 'fieldset',
+    '#title' => $instance['label'],
+    '#description' => $instance['description'],
+    '#tree' => TRUE,
+  );
   $element['#attached']['css'][drupal_get_path('module', 'flipclock7') . '/css/flipclock7_admin.css']['type'] = 'file';
   return $element;
+}
+
+/**
+ * Implements hook_date_combo_process_alter().
+ *
+ * Render our datetime elements as containers.
+ */
+function flipclock7_date_combo_process_alter(&$element, $form_state, $context) {
+  if (!empty($element['#flipclock7_container'])) {
+    $element['#theme_wrappers'] = ['container'];
+    $element['value'] += [
+      '#title' => t('End date and time'),
+    ];
+  }
+}
+
+/**
+ * Element validate callback: Validate the nested date element.
+ *
+ * @see flipclock7_field_widget_form()
+ */
+function flipclock7_datetime_validate($element, &$form_state) {
+  module_load_include('inc', 'date', 'date_elements');
+  $element['value']['#field']['type'] = 'datestamp';
+  $parents = _field_form_state_parents($element['#field_parents'], $element['#field_name'], $element['#language']);
+  $field_state = &drupal_array_get_nested_value($form_state, $parents);
+  $backup = $field_state;
+  _flipclock7_remove_prefix($field_state['instance']['widget']['type']);
+  date_combo_validate($element, $form_state);
+  $field_state = $backup;
+  $element['value']['#field']['type'] = 'flipclock7';
 }
 
 /**
@@ -127,19 +166,10 @@ function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, 
  */
 function flipclock7_validate($element, &$form_state) {
   $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-  if ($values['visibility'] === 1 && !trim($values['value']) == '') {
-    form_error($element['value'], t('You need to enter a date if the countdown timer is set to visible.'));
+  if ($values['visibility'] === 1 && trim($values['datetime']['value']) == '') {
+    form_error($element['datetime']['value'], t('You need to enter a date if the countdown timer is set to visible.'));
   }
-
-  module_load_include('inc', 'date', 'date_elements');
-  $element['value']['#field']['type'] = 'datestamp';
-  $parents = _field_form_state_parents($element['#field_parents'], $element['#field_name'], $element['#language']);
-  $field_state = &drupal_array_get_nested_value($form_state, $parents);
-  $backup = $field_state;
-  _flipclock7_remove_prefix($field_state['instance']['widget']['type']);
-  date_combo_validate($element, $form_state);
-  $field_state = $backup;
-  $element['value']['#field']['type'] = 'flipclock7';
+  $values['value'] = $values['datetime']['value'];
 }
 
 /**
