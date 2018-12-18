@@ -227,7 +227,7 @@ function flipclock7_display_timer($item, $language, $font_size) {
     'type' => 'setting',
   );
   $element['#attached']['css'][] = array(
-    'data' => $path . '/css/flipclock7.css',
+    'data' => $path . '/css/flipclock7_admin.css',
     'type' => 'file',
   );
 

@@ -3,7 +3,6 @@ description = Provides a field displaying an animated countdown clock.
 core = 7.x
 php = 7.0
 stylesheets[all][] = css/flipclock7.css
-stylesheets[all][] = css/flipclock7_admin.css
 dependencies[] = date
 dependencies[] = features
 dependencies[] = libraries
