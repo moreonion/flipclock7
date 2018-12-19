@@ -1,0 +1,19 @@
+/*
+ * We need this for correct indentation
+ * in the edit form, see flipclock7.field.inc
+ * line 81.
+ */
+fieldset.date-combo .form-margin:first-child {
+ margin-top: 10px;
+ margin-bottom: 5px;
+}
+
+fieldset.date-combo .form-margin {
+ margin-left: 10px;
+ margin-right: 10px;
+}
+
+.field-widget-flipclock7-date-popup
+.container-inline-date .form-type-date-popup .date-padding label {
+  display: block;
+}

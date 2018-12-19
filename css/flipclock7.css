@@ -1,92 +1,32 @@
-/*
- * We need this for correct indentation
- * in the edit form, see flipclock7.field.inc
- * line 81.
- */
-.form-margin:first-child {
-  margin-top: 10px;
-  margin-bottom: 5px;
+/* display styles */
+.flipclock7 {
+  overflow-x: hidden;
 }
 
-.form-margin {
-  margin-left: 10px;
-  margin-right: 10px;
+.flipclock7 #flipclock7-countdown {
+  width: inherit;
 }
 
-.flip-clock-wrapper {
-  font-size: 1em;
+.flipclock7 .flip-clock-wrapper {
   margin-left: 0;
   margin-right: 0;
-  margin-top: 2em;
+  margin-top: 4em;
   margin-bottom: 2em;
+  z-index: 1;
 }
 
-.flip-clock-wrapper ul {
-  /* Determines the overall size of the timer. */
-  font-size: 60px;
+/* set the height of the .flip-clock-divider according
+* to breakpoints in the theme
+*/
+.flipclock7 .flip-clock-dot.top {
+  top: 30%;
 }
 
-@media screen and (max-width: 815px) {
-  .flip-clock-wrapper ul {
-    height: .5em;
-    width: .35em;
-  }
-  .flip-clock-divider {
-    height: 3em;
-    width: .25em;
-    padding: 5px;
-  }
-  .flip-clock-dot {
-    width: .35em;
-    height: .35em;
-    left: .15em;
-  }
-  .flip-clock-dot.bottom {
-    bottom: .75em;
-  }
-  .flip-clock-dot.top {
-    top: 1em;
-  }
-  .flip-clock-wrapper ul li a div {
-    font-size: .5em;
-  }
-  .flip-clock-wrapper ul li a div div.inn {
-    font-size: .5em;
-  }
-  .flip-clock-wrapper ul li {
-    line-height: .5em;
-  }
-  .flip-clock-wrapper ul {
-    margin: 2.5px;
-  }
-  .flip-clock-divider .flip-clock-label {
-    right: -3em;
-  }
-  .flip-clock-divider.hours .flip-clock-label {
-    right: -3.5em;
-  }
-  .flip-clock-divider.minutes .flip-clock-label {
-    right: -4em;
-  }
-  .flip-clock-divider.seconds .flip-clock-label {
-    right: -4em;
-  }
+.flipclock7 .flip-clock-dot.bottom {
+  bottom: 30%;
 }
-@media screen and (max-width: 338px) {
-  .flip-clock-wrapper ul {
-    height: .5em;
-    width: .275em;
-  }
-  .flip-clock-divider .flip-clock-label {
-    right: -3em;
-  }
-  .flip-clock-divider.hours .flip-clock-label {
-    right: -3em;
-  }
-  .flip-clock-divider.minutes .flip-clock-label {
-    right: -3.5em;
-  }
-  .flip-clock-divider.seconds .flip-clock-label {
-    right: -4em;
-  }
+
+/* no padding in front of the first clock element */
+.flipclock7 .flip-clock-divider:first-child {
+  padding: 0;
 }
