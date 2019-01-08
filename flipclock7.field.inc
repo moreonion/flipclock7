@@ -122,6 +122,7 @@ function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, 
     '#description' => $instance['description'],
     '#tree' => TRUE,
   );
+  $element['#attributes']['class'][] = 'field-group-heading';
   $element['#attached']['css'][drupal_get_path('module', 'flipclock7') . '/css/flipclock7_admin.css']['type'] = 'file';
   return $element;
 }
