@@ -85,14 +85,15 @@ function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, 
   // the date_popup module forces the date-padding class
   // on child elements, meaning the date elements will
   // be indented by 10px.
+  $visibility_id = drupal_html_id('flipclock7-visibility');
   $element['visibility'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display a countdown'),
     '#default_value' => $item['visibility'],
     '#weight' => -10,
+    '#id' => $visibility_id,
   );
-  $visibility_id = "#edit-" . strtr($field['field_name'], '_', '-') . "-und-$delta-visibility";
-  $visibility_state['#states']['visible'][$visibility_id]['checked'] = TRUE;
+  $visibility_state['#states']['visible']["#$visibility_id"]['checked'] = TRUE;
 
   $element['heading'] = array(
     '#type' => 'textfield',
