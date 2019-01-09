@@ -15,6 +15,11 @@
   z-index: 1;
 }
 
+.flipclock7 .flip-clock-wrapper ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 /* set the height of the .flip-clock-divider according
 * to breakpoints in the theme
 */
@@ -29,4 +34,5 @@
 /* no padding in front of the first clock element */
 .flipclock7 .flip-clock-divider:first-child {
   padding: 0;
+  width: 0;
 }
