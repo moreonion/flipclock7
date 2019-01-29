@@ -78,51 +78,58 @@ function flipclock7_form_field_ui_field_edit_form_alter(&$form, &$form_state, $f
  * Implements hook_field_widget_form().
  */
 function flipclock7_field_widget_form(&$form, &$form_state, &$field, $instance, $langcode, $items, $delta, $element) {
-  $item = $items[$delta] ?? [];
+  $item = ($items[$delta] ?? []) + [
+    'visibility' => NULL,
+    'heading' => '',
+  ];
   $item += $field['settings'];
 
-  // We have to hack a div around our elements because
-  // the date_popup module forces the date-padding class
-  // on child elements, meaning the date elements will
-  // be indented by 10px.
   $visibility_id = drupal_html_id('flipclock7-visibility');
-  $element['visibility'] = array(
+  $element['visibility'] = [
     '#type' => 'checkbox',
     '#title' => t('Display a countdown'),
     '#default_value' => $item['visibility'],
     '#weight' => -10,
     '#id' => $visibility_id,
-  );
+  ];
   $visibility_state['#states']['visible']["#$visibility_id"]['checked'] = TRUE;
 
-  $element['heading'] = array(
+  $dt_field = ['type' => 'datestamp'] + $field;
+  $dt_instance = $instance;
+  // Strip flipclock7_ from the widget_type to get a valid
+  // date module widget type.
+  _flipclock7_remove_prefix($dt_instance['widget']['type']);
+  $time_items[$delta] = isset($item['value']) ? ['value' => $item['value']] : [];
+  $element['end'] = [
+    // The title is set again in flipclock7_date_combo_process_alter() as
+    // it will be overidden by the date module.
+    '#title' => t('Countdown end time'),
+    '#description' => t('Point in time where countdown’s value reaches zero.'),
+    '#flipclock7_container' => TRUE,
+    '#element_validate' => ['flipclock7_datetime_validate'],
+  ] + date_field_widget_form($form, $form_state, $dt_field, $dt_instance, $langcode, $time_items, $delta, [
+    '#field_name' => $element['#field_name'],
+    '#delta' => $element['#delta'],
+    '#bundle' => $element['#bundle'],
+    '#entity_type' => $element['#entity_type'],
+    '#field_parents' => $element['#field_parents'],
+    '#language' => $element['#language'],
+  ]) + $visibility_state;
+
+  $element['heading'] = [
     '#type' => 'textfield',
     '#title' => t('Heading'),
     '#maxlength' => 90,
     '#default_value' => $item['heading'],
-  ) + $visibility_state;
+  ] + $visibility_state;
 
-  $dt_field = ['type' => 'datestamp'] + $field;
-  $element['datetime'] =  [
-    '#flipclock7_container' => TRUE,
-    '#element_validate' => ['flipclock7_datetime_validate'],
-  ] + date_field_widget_form($form, $form_state, $dt_field, $instance, $langcode, $items, $delta, [
-    '#field_parents' => $element['#field_parents'],
-    '#field_name' => $element['#field_name'],
-    '#language' => $element['#language'],
-  ]) + $visibility_state;
-
-  // Strip flipclock7_ from the widget_type to get a valid
-  // date module widget type.
-  _flipclock7_remove_prefix($element['datetime']['#widget_type']);
-  $element['#element_validate'] = ['flipclock7_validate'];
-
-  $element += array(
+  $element += [
     '#type' => 'fieldset',
     '#title' => $instance['label'],
     '#description' => $instance['description'],
     '#tree' => TRUE,
-  );
+    '#element_validate' => ['flipclock7_validate'],
+  ];
   $element['#attributes']['class'][] = 'field-group-heading';
   $element['#attached']['css'][drupal_get_path('module', 'flipclock7') . '/css/flipclock7_admin.css']['type'] = 'file';
   return $element;
@@ -137,7 +144,7 @@ function flipclock7_date_combo_process_alter(&$element, $form_state, $context) {
   if (!empty($element['#flipclock7_container'])) {
     $element['#theme_wrappers'] = ['container'];
     $element['value'] += [
-      '#title' => t('End date and time'),
+      '#title' => t('Countdown end time'),
     ];
   }
 }
@@ -168,10 +175,10 @@ function flipclock7_datetime_validate($element, &$form_state) {
  */
 function flipclock7_validate($element, &$form_state) {
   $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-  if ($values['visibility'] === 1 && trim($values['datetime']['value']) == '') {
-    form_error($element['datetime']['value'], t('You need to enter a date if the countdown timer is set to visible.'));
+  if ($values['visibility'] === 1 && trim($values['end']['value']) == '') {
+    form_error($element['end']['value'], t('You need to enter a date if the countdown timer is set to visible.'));
   }
-  $values['value'] = $values['datetime']['value'];
+  $values['value'] = $values['end']['value'];
 }
 
 /**
